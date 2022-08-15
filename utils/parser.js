@@ -2,13 +2,13 @@ const axios = require("axios");
 
 const getFullURL = (url) => {
   let res = url;
-  if (!url.startsWith("https://") && !url.startsWith("http://")) {
+  if (!/^(https?:\/\/)/g.test(url)) {
     res = "https://" + res;
   }
   return res;
 };
 
-const parser = async (url) => {
+const parse = async (url) => {
   const response = await axios.get(encodeURI(getFullURL(url)).replace(/^([^?#]*).*/, "$1"));
 
   if (response.status >= 400) {
@@ -18,10 +18,15 @@ const parser = async (url) => {
   const res = { linkImg: "", title: "", text: "", url: encodeURI(getFullURL(url)) };
   const html = response.data;
 
-  res.text = html
-    .replaceAll(/<script[^>]*>(\r?\n|\r)*.*<\/script>/gim, "")
-    .replaceAll(/<[^>]*>/gim, "")
-    .replaceAll(/(  +)|(\r)|(\n)|(\t)|(\\+r)|(\\+n)|(\\+t)|/gim, "");
+  const textArr = html.match(
+    /<(p|h1|h2|h3|h4|h5|td|b|span|a)[^>]*>[\r\n\t\s]*([^<]+)[\r\n\t\s]*<\/(p|h1|h2|h3|h4|h5|td|b|span|a)>/gim
+  );
+  if (!!textArr && !!textArr.length) {
+    res.text = textArr
+      .join(" ")
+      .replaceAll(/<[^>]*>/gim, "")
+      .replaceAll(/(  +)|(\r)|(\n)|(\t)|(\\+r)|(\\+n)|(\\+t)|/gim, "");
+  }
 
   const linkImgTags = html.match(/<meta[^>]+og:image[^>]+>/gim);
 
@@ -42,4 +47,4 @@ const parser = async (url) => {
   return res;
 };
 
-module.exports = { parser };
+module.exports = { parse };
