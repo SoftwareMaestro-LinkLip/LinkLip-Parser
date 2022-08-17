@@ -6,7 +6,7 @@
 
 ### Prerequisites
 
-- Make sure your NodeJS and npm versions are up to date
+- Make sure your NodeJS and yarn versions are up to date
 
 ### Download
 
@@ -19,7 +19,7 @@ $ git clone https://github.com/SoftwareMaestro-LinkLip/LinkLip-Parser.git
 ### Installation
 
 ```bash
-$ npm install
+$ yarn install
 ```
 
 ### Basic Usage
@@ -27,7 +27,7 @@ $ npm install
 - start server
 
 ```bash
-$ npm run start
+$ yarn dev
 ```
 
 <br />
@@ -42,14 +42,14 @@ $ npm run start
 ### Prerequisites
 
 - Install editor `Visual Studio Code`
-- Make sure your `NodeJS` and `npm` versions are up to date
+- Make sure your `NodeJS` and `yarn` versions are up to date
 
 ### Setting up Dev
 
 ```bash
 $ git clone https://github.com/SoftwareMaestro-LinkLip/LinkLip-Parser.git
 $ cd LinkLip-Parser
-$ npm install
+$ yarn install
 ```
 
 ### Deploying / Publishing
@@ -60,7 +60,7 @@ $ npm install
 
 ## Directory Structure
 
-    linklip-client
+    linklip-parser
     ├── public/             # static files
     ├── utils/              # utilitis
     │   └── parser.js       # web parser
