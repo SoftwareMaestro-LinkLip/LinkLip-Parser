@@ -9,9 +9,11 @@ const getFullURL = (url) => {
 };
 
 const parse = async (url) => {
-  const response = await axios.get(encodeURI(getFullURL(url)).replace(/^([^?#]*).*/, "$1"));
+  const response = await axios.get(encodeURI(getFullURL(url)).replace(/^([^?#]*).*/, "$1")).catch((err) => {
+    console.log(err);
+  });
 
-  if (response.status >= 400) {
+  if (!response || !response.data.success || response.status >= 400) {
     throw response;
   }
 
@@ -28,13 +30,44 @@ const parse = async (url) => {
       .replaceAll(/(  +)|(\r)|(\n)|(\t)|(\\+r)|(\\+n)|(\\+t)|/gim, "");
   }
 
-  const linkImgTags = html.match(/<meta[^>]+og:image[^>]+>/gim);
-
-  if (!!linkImgTags && !!linkImgTags.length) {
-    const imgURLs = linkImgTags[0].match(/(https?:\/\/)[^("|')]+("|')/g);
+  const OGImgTags = html.match(/<meta[^>]+og:image[^>]+>/gim);
+  if (!!OGImgTags && !!OGImgTags.length) {
+    const imgURLs = OGImgTags[0].match(/(https?:\/\/)[^("|')]+("|')/g);
 
     if (!!imgURLs) {
-      res.linkImg = imgURLs[0].slice(0, -1);
+      const imgURL = imgURLs[0].slice(0, -1);
+
+      const response = await axios
+        .get(encodeURI(imgURL).replace(/^([^?#]*).*/, "$1"))
+        .then(() => {
+          res.linkImg = imgURL;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  } else {
+    if (!!imgTags && !!imgTags.length) {
+      const imgTags = html.match(/<img[^>]*\/?>/gim);
+
+      for (let imgTag of imgTags) {
+        const imgURLs = imgTag.match(/(https?:\/\/)[^("|')]+("|')/g);
+
+        if (!!imgURLs) {
+          const imgURL = imgURLs[0].slice(0, -1);
+          const response = await axios
+            .get(encodeURI(imgURL).replace(/^([^?#]*).*/, "$1"))
+            .then(() => {
+              res.linkImg = imgURL;
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          if (!!res.linkImg) {
+            break;
+          }
+        }
+      }
     }
   }
 
