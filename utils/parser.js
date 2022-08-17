@@ -13,7 +13,9 @@ const parse = async (url) => {
     console.log(err);
   });
 
-  if (!response || !response.data.success || response.status >= 400) {
+  console.log("hji");
+
+  if (response.status >= 400) {
     throw response;
   }
 
