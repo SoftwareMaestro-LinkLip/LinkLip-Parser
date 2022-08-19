@@ -1,23 +1,23 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const cors = require("cors");
-const { parse } = require("./utils/parser");
+const cors = require('cors');
+const { parse } = require('./utils/parser');
 
 app.use(cors());
 
-app.get("/link/v1", (req, res) => {
+app.get('/link/v1', (req, res) => {
   let url = req.query.url;
 
   parse(url)
     .then((data) => {
-      // console.log("data", data);
       return res.status(200).json({
         success: true,
         data,
       });
     })
     .catch((err) => {
-      return res.status(400).json({
+      console.log(err);
+      return res.status(401).json({
         success: false,
         err,
       });
