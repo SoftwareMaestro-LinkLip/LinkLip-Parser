@@ -9,22 +9,23 @@ const getFullURL = (url) => {
 };
 
 const parse = async (url) => {
-  const response = await axios
-    .get(encodeURI(getFullURL(url)).replace(/^([^?#]*).*/, '$1'))
-    .catch((err) => {
-      console.log(err);
-    });
-
-  if (response.status >= 400) {
-    throw response;
-  }
-
   const res = {
     linkImg: '',
     title: '',
     text: '',
     url: encodeURI(getFullURL(url)),
   };
+
+  const response = await axios
+    .get(encodeURI(getFullURL(url)).replace(/^([^?#]*).*/, '$1'))
+    .catch((err) => {
+      console.log(err);
+    });
+
+  if (!response || response.status >= 400) {
+    return res;
+  }
+
   const html = response.data;
 
   const textArr = html.match(
@@ -39,7 +40,7 @@ const parse = async (url) => {
 
   const OGImgTags = html.match(/<meta[^>]+og:image[^>]+>/gim);
   if (!!OGImgTags && !!OGImgTags.length) {
-    const imgURLs = OGImgTags[0].match(/(https?:\/\/)[^("|')]+("|')/g);
+    const imgURLs = OGImgTags[0].match(/(https:\/\/)[^("|')]+("|')/g);
 
     if (!!imgURLs) {
       const imgURL = imgURLs[0].slice(0, -1);
@@ -61,7 +62,7 @@ const parse = async (url) => {
     const imgTags = html.match(/<img[^>]*\/?>/gim);
     if (!!imgTags && !!imgTags.length) {
       for (let imgTag of imgTags) {
-        const imgURLs = imgTag.match(/(https?:\/\/)[^("|')]+("|')/g);
+        const imgURLs = imgTag.match(/(http?:\/\/)[^("|')]+("|')/g);
 
         if (!!imgURLs) {
           const imgURL = imgURLs[0].slice(0, -1);
@@ -73,7 +74,6 @@ const parse = async (url) => {
             .catch((err) => {
               console.log(err);
             });
-          // res.linkImg = imgURL;
 
           if (!!res.linkImg) {
             break;
